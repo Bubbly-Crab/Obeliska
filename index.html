@@ -20,34 +20,79 @@
       box-sizing: border-box;
     }
 
-    body {
+    body, html {
       background-color: var(--deep-blue);
       color: white;
       font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
-      height: 300vh;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .main-container {
+      width: 100vw;
+      height: 100vh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      position: relative;
+      z-index: 1;
+      scrollbar-width: none;
+    }
+
+    .main-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .page {
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      scroll-snap-align: start;
+      padding: 2rem;
       position: relative;
-      transition: background-color 20s ease-in-out;
     }
 
-    .container {
-      text-align: center;
-      z-index: 10;
-      padding: 2rem;
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
+      height: 60px;
+      background-color: var(--deep-blue);
+      border-bottom: 1px solid var(--light-blue);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 1000;
+      color: white;
+      pointer-events: auto;
+    }
+
+    .menu-btn {
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--light-blue);
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .menu-line {
+      width: 24px;
+      height: 3px;
+      background: var(--light-blue);
+      border-radius: 2px;
     }
 
     .language-switch {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 20;
       display: flex;
       gap: 15px;
       font-size: 0.9rem;
@@ -63,7 +108,6 @@
 
     .language-option:hover {
       background: rgba(77, 166, 255, 0.2);
-      transform: scale(1.05);
     }
 
     .language-option.active {
@@ -71,7 +115,55 @@
       font-weight: 600;
     }
 
-    h1 {
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100vh;
+      background-color: var(--deep-blue);
+      border-right: 1px solid var(--light-blue);
+      padding: 70px 20px 20px;
+      z-index: 999;
+      transition: left 0.3s ease;
+      color: white;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+      display: none;
+    }
+
+    .sidebar.open ~ .sidebar-overlay {
+      display: block;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px 16px;
+      color: var(--light-blue);
+      text-decoration: none;
+      font-size: 1rem;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: background 0.3s;
+    }
+
+    .sidebar a:hover {
+      background: rgba(77, 166, 255, 0.2);
+    }
+
+    h1, .page-title {
       font-size: 5rem;
       font-weight: 800;
       margin-bottom: 1rem;
@@ -85,7 +177,7 @@
       transition: filter 0.5s ease;
     }
 
-    h1:hover {
+    h1:hover, .page-title:hover {
       filter: brightness(1.5);
     }
 
@@ -127,29 +219,36 @@
       box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
     }
 
-    /* === 背景装饰元素 === */
-    .bubble {
+    .decoration {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bubble, .line, .cloud {
       position: absolute;
+    }
+
+    .bubble {
       border-radius: 50%;
       opacity: 0.2;
       filter: blur(20px);
-      z-index: 1;
       animation: float 15s infinite ease-in-out alternate;
     }
 
     .line {
-      position: absolute;
       height: 12px;
       background: linear-gradient(90deg, var(--light-blue), var(--orange), var(--yellow), var(--light-blue));
       border-radius: 20px;
       opacity: 0.15;
       transform-origin: left;
-      z-index: 1;
     }
 
-    /* === 修复云朵：确保可见 === */
     .cloud {
-      position: absolute;
       width: 120px;
       height: 60px;
       background-image: url('https://img.alicdn.com/imgextra/i4/O1CN01Z5paLz1aG6XJfuDpa_!!6000000003970-2-tps-120-60.png');
@@ -157,20 +256,11 @@
       background-repeat: no-repeat;
       opacity: 0.15;
       filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.1));
-      z-index: 3; /* 高于流星 */
-      pointer-events: none;
+      z-index: 3;
     }
 
-    /* === 流星雨区域 === */
     .meteor-section {
-      width: 100%;
-      height: 100vh;
       position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: var(--deep-blue);
       overflow: hidden;
     }
 
@@ -189,7 +279,6 @@
       line-height: 1.6;
     }
 
-    /* === 流星动画 === */
     .meteor {
       position: absolute;
       width: 4px;
@@ -207,20 +296,10 @@
     }
 
     @keyframes shoot-meteor {
-      0% {
-        transform: translate(0, 0);
-        opacity: 0;
-      }
-      5% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        transform: translate(-2000px, 1400px);
-        opacity: 0;
-      }
+      0% { transform: translate(0, 0); opacity: 0; }
+      5% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translate(-2000px, 1400px); opacity: 0; }
     }
 
     @keyframes fadeIn {
@@ -231,18 +310,11 @@
     }
 
     @keyframes float {
-      0% {
-        transform: translateY(0) translateX(0);
-      }
-      50% {
-        transform: translateY(-30px) translateX(20px);
-      }
-      100% {
-        transform: translateY(0) translateX(0);
-      }
+      0% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-30px) translateX(20px); }
+      100% { transform: translateY(0) translateX(0); }
     }
 
-    /* === TXT 模态框 === */
     .txt-modal {
       display: none;
       position: fixed;
@@ -305,68 +377,118 @@
       white-space: pre-wrap;
     }
 
-    footer {
-      width: 100%;
+    .contact-section {
       background: rgba(15, 26, 61, 0.8);
       backdrop-filter: blur(10px);
-      padding: 2rem 0;
-      margin-top: auto;
+      border-top: 1px solid rgba(77, 166, 255, 0.2);
       text-align: center;
+      padding: 3rem 2rem;
       color: var(--light-blue);
       font-size: 0.9rem;
-      border-top: 1px solid rgba(77, 166, 255, 0.2);
-      z-index: 5;
     }
 
-    footer a {
+    .contact-section a {
       color: var(--yellow);
       text-decoration: none;
       margin: 0 1rem;
     }
 
-    footer a:hover {
+    .contact-section a:hover {
       text-decoration: underline;
+    }
+
+    .contact-section .copyright {
+      margin-top: 1rem;
+      color: #888;
+    }
+
+    .contact-section .icp {
+      margin-top: 0.5rem;
+      color: #888;
     }
   </style>
 </head>
 <body>
 
-  <!-- 语言切换 -->
-  <div class="language-switch">
-    <div class="language-option active" id="lang-en" onclick="switchLanguage('en')">EN</div>
-    <div class="language-option" id="lang-zh" onclick="switchLanguage('zh')">中文</div>
-  </div>
-
-  <!-- 首页 -->
-  <div class="container" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-    <h1 id="title">Hello, Obeliska!</h1>
-    <p id="description">Obeliska is an open-source community sharing the future with you through collaboration and innovation.</p>
-    <div class="btn-group">
-      <button class="hero-btn" onclick="window.open('https://baidu.com', '_blank')">Dev</button>
-      <button class="hero-btn" onclick="window.open('https://bilibili.com', '_blank')">Web</button>
-      <button class="hero-btn" onclick="window.open('https://noi.cn', '_blank')">Plugin</button>
-      <button class="hero-btn" onclick="window.open('https://chat.qwen.ai', '_blank')">AI</button>
+  <!-- 顶部导航栏 -->
+  <div class="top-nav">
+    <button class="menu-btn" id="menuBtn">
+      <span class="menu-line"></span>
+      <span class="menu-line"></span>
+      <span class="menu-line"></span>
+    </button>
+    <div class="language-switch">
+      <div class="language-option active" id="lang-en" onclick="switchLanguage('en')">EN</div>
+      <div class="language-option" id="lang-zh" onclick="switchLanguage('zh')">中文</div>
     </div>
   </div>
 
-  <!-- 第二页：流星雨区域 -->
-  <section class="meteor-section">
-    <h2>Shooting Stars of Innovation</h2>
-    <p>Like meteors blazing across the night, every idea leaves a trail of light. Join the storm!</p>
-  </section>
+  <!-- 侧边栏 -->
+  <div class="sidebar" id="sidebar">
+    <a href="#home" onclick="closeSidebar()">首页</a>
+    <a href="#" onclick="window.open('https://github.com/Bubbly-Crab/Obeliska/tree/Dev-Projects', '_blank'); closeSidebar();">Dev Project</a>
+    <a href="#" onclick="window.open('https://github.com/Bubbly-Crab/Obeliska/tree/Web-Projects', '_blank'); closeSidebar();">Web Project</a>
+    <a href="#" onclick="window.open('https://github.com/Bubbly-Crab/Obeliska/tree/Plugin-Projects', '_blank'); closeSidebar();">Plugin Project</a>
+    <a href="#" onclick="window.open('https://github.com/Bubbly-Crab/Obeliska/tree/AI-Projects', '_blank'); closeSidebar();">AI Project</a>
+    <a href="https://github.com/Obeliska-Community" target="_blank" rel="noopener">GitHub 团队</a>
+  </div>
+  <div class="sidebar-overlay" onclick="closeSidebar()"></div>
 
-  <!-- 页脚 -->
-  <footer>
-    <div id="contact-info">Contact Us: Obeliska@163.com | GitHub: github.com/Obeliska-Community</div>
-    <div style="margin-top: 0.5rem;">
-      <!-- TXT 文件链接 -->
-      <a href="#" onclick="openTxtModal('https://bubbly-crab.github.io/Obeliska/README.txt'); return false;">Code of Conduct</a>
-      <a href="https://github.com/Obeliska-Community/.github/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener">Code of Conduct</a>
-      <a href="https://obeliska.org/privacy" target="_blank" rel="noopener">Privacy Policy</a>
-    </div>
-    <div style="margin-top: 1rem; color: #888;">© 2025 Tithu Software Studio. All rights reserved.</div>
-    <div style="margin-top: 0.5rem; color: #888;">ICP备案号：</div>
-  </footer>
+  <!-- 背景装饰 -->
+  <div class="decoration" id="decoration"></div>
+
+  <!-- 主滚动容器 -->
+  <div class="main-container" id="mainContainer">
+
+    <!-- 首页 -->
+    <section id="home" class="page">
+      <div class="container">
+        <h1 id="title">Hello, Obeliska!</h1>
+        <p id="description">Obeliska is an open-source community building the future together through collaboration and innovation.</p>
+        <div class="btn-group">
+          <button class="hero-btn" onclick="window.open('https://github.com/Bubbly-Crab/Obeliska/tree/Dev-Projects', '_blank')">Dev</button>
+          <button class="hero-btn" onclick="window.open('https://github.com/Bubbly-Crab/Obeliska/tree/Web-Projects', '_blank')">Web</button>
+          <button class="hero-btn" onclick="window.open('https://github.com/Bubbly-Crab/Obeliska/tree/Plugin-Projects', '_blank')">Plugin</button>
+          <button class="hero-btn" onclick="window.open('https://github.com/Bubbly-Crab/Obeliska/tree/AI-Projects', '_blank')">AI</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 页面3 -->
+    <section id="page3" class="page">
+      <div class="container">
+        <h1 class="page-title" id="title3">Up-and-Comers in the Digital Era</h1>
+        <p id="desc3">Obeliska open-source community's open, high-quality, and practical features will surely make it the focus of future open-source users.</p>
+      </div>
+    </section>
+
+    <!-- 页面4 -->
+    <section id="page4" class="page">
+      <div class="container">
+        <h1 class="page-title" id="title4">We Don't Launch New Products</h1>
+        <p id="desc4">We focus on maintaining existing products to maximize their value.</p>
+      </div>
+    </section>
+
+    <!-- 流星雨区域 -->
+    <section class="meteor-section page" id="meteor">
+      <h2 id="meteor-title">Shooting Stars of Innovation</h2>
+      <p id="meteor-desc">Like meteors blazing across the night, every idea leaves a trail of light. Join the storm!</p>
+    </section>
+
+    <!-- 联系信息页 -->
+    <section class="contact-section page">
+      <div id="contact-info">Contact Us: Obeliska@163.com | GitHub: github.com/Obeliska-Community</div>
+      <div style="margin-top: 0.5rem;">
+        <a href="#" onclick="openTxtModal('https://obeliska.space/README.txt'); return false;">Code of Conduct</a>
+        <a href="https://obeliska.space/Project_Number_Application_Form.txt" target="_blank" rel="noopener">Release Template (EN)</a>
+        <a href="https://obeliska.space/Privacy_Policy.txt" target="_blank" rel="noopener">Privacy Policy</a>
+      </div>
+      <div class="copyright">© Copyright 2025 Tithu Software Studio. All rights reserved.</div>
+      <!<div class="icp">ICP备案号：暂无</div>>
+    </section>
+
+  </div>
 
   <!-- TXT 模态框 -->
   <div id="txtModal" class="txt-modal">
@@ -382,53 +504,60 @@
   </div>
 
   <script>
-    // 语言内容
+    // === 语言内容（已包含流星页文本）===
     const langContent = {
       en: {
         title: "Hello, Obeliska!",
         description: "Obeliska is an open-source community building the future together through collaboration and innovation.",
-        contact: "Contact Us: Obeliska@163.com | GitHub: github.com/Obeliska-Community",
-        readmefile: "https://
+        title3: "Over 1000+ Users' Choice",
+        desc3: "Obeliska open-source community's open, high-quality, and practical features will surely make it the focus of future open-source users.",
+        title4: "We Don't Launch New Products",
+        desc4: "We focus on maintaining existing products to maximize their value.",
+        meteorTitle: "Shooting Stars of Innovation",
+        meteorDesc: "Like meteors blazing across the night, every idea leaves a trail of light. Join the storm!",
+        contact: "Contact Us: Obeliska@163.com | GitHub: github.com/Obeliska-Community"
       },
       zh: {
         title: "你好，Obeliska！",
         description: "Obeliska 是一个开源软件社区，通过协作与创新，与你携手共同分享未来。",
-        contact: "联系我们：Obeliska@163.com | GitHub：github.com/Obeliska-Community",
-        readmefile: "https://
+        title3: "信息时代的潜力股",
+        desc3: "Obeliska开源社区开放、优质、实用的特性，必定会使其成为未来开源社区用户的焦点。",
+        title4: "我们不发布新产品",
+        desc4: "我们专注维护已有的产品，使其发挥最大的价值。",
+        meteorTitle: "思绪的星河",
+        meteorDesc: "如同划破夜空的流星，Obeliska社区的每一个想法都留下了光芒。加入这场流星雨吧！",
+        contact: "联系我们：Obeliska@163.com | GitHub：github.com/Obeliska-Community"
       }
     };
-    
-    function openCurrentNotice() {
-      const currentLang = document.getElementById('lang-en').classList.contains('active') ? 'en' : 'zh';
-      const fileUrl = langContent[currentLang].noticeFile;
-      openTxtModal(fileUrl);
-    }
 
     function switchLanguage(lang) {
       document.getElementById('lang-en').classList.remove('active');
       document.getElementById('lang-zh').classList.remove('active');
       document.getElementById(`lang-${lang}`).classList.add('active');
-      
+
       document.getElementById('title').textContent = langContent[lang].title;
       document.getElementById('description').textContent = langContent[lang].description;
+      document.getElementById('title3').textContent = langContent[lang].title3;
+      document.getElementById('desc3').textContent = langContent[lang].desc3;
+      document.getElementById('title4').textContent = langContent[lang].title4;
+      document.getElementById('desc4').textContent = langContent[lang].desc4;
+      document.getElementById('meteor-title').textContent = langContent[lang].meteorTitle;
+      document.getElementById('meteor-desc').textContent = langContent[lang].meteorDesc;
       document.getElementById('contact-info').textContent = langContent[lang].contact;
     }
 
-    // === 背景颜色渐变 ===
-    function animateBackground() {
-      const colors = [
-        { bg: '#0f1a3d', light: '#4da6ff' },
-        { bg: '#0a1433', light: '#ff6b35' },
-        { bg: '#0f1a3d', light: '#4da6ff' }
-      ];
-      let index = 0;
-      setInterval(() => {
-        document.body.style.backgroundColor = colors[index].bg;
-        index = (index + 1) % colors.length;
-      }, 20000);
+    // === 侧边栏控制 ===
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
     }
 
-    // === 创建背景元素 ===
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+    }
+
+    document.getElementById('menuBtn').addEventListener('click', toggleSidebar);
+
+    // === 创建背景装饰元素 ===
     function createBubble() {
       const bubble = document.createElement('div');
       bubble.classList.add('bubble');
@@ -441,10 +570,9 @@
         left: `${Math.random() * 100}vw`,
         top: `${Math.random() * 100}vh`,
         animationDuration: `${Math.random() * 10 + 15}s`,
-        animationDelay: `${Math.random() * 5}s`,
-        zIndex: 1
+        animationDelay: `${Math.random() * 5}s`
       });
-      document.body.appendChild(bubble);
+      document.getElementById('decoration').appendChild(bubble);
     }
 
     function createLine() {
@@ -456,10 +584,9 @@
         width: '0',
         left: `${Math.random() * 100}vw`,
         top: `${Math.random() * 100}vh`,
-        transform: `rotate(${angle}deg)`,
-        zIndex: 1
+        transform: `rotate(${angle}deg)`
       });
-      document.body.appendChild(line);
+      document.getElementById('decoration').appendChild(line);
       setTimeout(() => {
         line.style.transition = 'width 3s ease-out';
         line.style.width = `${length}px`;
@@ -473,10 +600,9 @@
         left: `${Math.random() * 100}vw`,
         top: `${Math.random() * 100}vh`,
         opacity: '0.15',
-        transform: `scale(${Math.random() * 0.8 + 0.6})`,
-        zIndex: 3
+        transform: `scale(${Math.random() * 0.8 + 0.6})`
       });
-      document.body.appendChild(cloud);
+      document.getElementById('decoration').appendChild(cloud);
 
       setInterval(() => {
         const currentLeft = parseFloat(cloud.style.left);
@@ -506,10 +632,9 @@
         top: `${startY}px`,
         width: '4px',
         height: '4px',
-        animationDuration: `${duration}s`,
-        zIndex: 2
+        animationDuration: `${duration}s`
       });
-      document.querySelector('.meteor-section').appendChild(meteor);
+      document.getElementById('meteor').appendChild(meteor);
       setTimeout(() => meteor.remove(), duration * 1000 + 500);
     }
 
@@ -517,7 +642,7 @@
       setInterval(() => createMeteor(), Math.random() * 1500 + 2500);
     }
 
-    // === TXT 模态框控制 ===
+    // === TXT 模态框 ===
     function openTxtModal(url) {
       const modal = document.getElementById('txtModal');
       const body = document.getElementById('txtBody');
@@ -540,7 +665,6 @@
 
     // === 初始化 ===
     window.addEventListener('load', () => {
-      animateBackground();
       for (let i = 0; i < 6; i++) createBubble();
       for (let i = 0; i < 8; i++) createLine();
       for (let i = 0; i < 5; i++) createCloud();
