@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gobang Barbecue 五子棋小游戏</title>
+  <style>
+    body {
+      font-family: 'Microsoft YaHei', 'SimSun', serif;
+      text-align: center;
+      background: url(image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDACgcHiMeGSgjISMtKygwPGRBPDc3PHtYRlBhVVlbXFxcXFxmZ4B0gGZbcGpccGp8iIiIgNTUMTpxeqwcIiMj/2wBDAR8mJiYwJzIrKzI4cHJwcnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnJyc......) no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 40px;
+      color: #4b2e2b;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255, 255, 255, 0.7);
+      z-index: -1;
+    }
+
+    h1 {
+      color: #8b4513;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      font-size: 2.2em;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .subtitle {
+      color: #a0522d;
+      font-style: italic;
+      margin-bottom: 30px;
+    }
+
+    #game-container {
+      display: inline-block;
+      background: #f5e6d3;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 
+        0 10px 30px rgba(0,0,0,0.2),
+        inset 0 0 15px rgba(139, 69, 19, 0.3);
+      border: 12px solid #8b4513;
+      position: relative;
+      max-width: 600px;
+    }
+
+    #board-wrapper {
+      position: relative;
+      display: inline-grid;
+      grid-template-columns: 20px repeat(15, 30px);
+      grid-template-rows: 20px repeat(15, 30px);
+      gap: 0;
+    }
+
+    .label-row, .label-col {
+      color: #8b4513;
+      font-weight: bold;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      background: transparent;
+    }
+
+    #board {
+      grid-column: 2 / span 15;
+      grid-row: 2 / span 15;
+      display: grid;
+      grid-template-columns: repeat(15, 30px);
+      grid-template-rows: repeat(15, 30px);
+      gap: 0;
+      border: 1px solid #5d4037;
+      background: #f9f0e0 url(image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAACyElEQVR4Ae3aMU7DMBSF4d8DVaAgJiBhACZgAIZgCIZgAIaAAShJUdJS0dK35Xw2tR3Hj3+SnHv9nHbd1n3r+77e3L8Z658jQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIA......) center center / cover;
+      position: relative;
+      border-radius: 4px;
+    }
+
+    .cell {
+      width: 30px;
+      height: 30px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .cell::before, .cell::after {
+      content: '';
+      position: absolute;
+      background-color: #4e342e;
+    }
+
+    .cell::before {
+      top: 50%; left: 0; width: 100%; height: 1px;
+      transform: translateY(-50%);
+    }
+
+    .cell::after {
+      left: 50%; top: 0; width: 1px; height: 100%;
+      transform: translateX(-50%);
+    }
+
+    .stone {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      opacity: 0;
+      animation: drop 0.3s forwards;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    @keyframes drop {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      70% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    .black { background-color: #111; }
+    .white { background-color: #fff; border: 1px solid #ccc; }
+
+    .win-stone {
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 10px 2px gold; }
+      to { transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 0 20px 5px #ffeb3b; }
+    }
+
+    #status {
+      margin: 20px 0 10px;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #8b4513;
+    }
+
+    button {
+      padding: 10px 18px;
+      margin: 0 8px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #reset {
+      background-color: #8b4513;
+      color: white;
+    }
+
+    #reset:hover {
+      background-color: #6b3513;
+    }
+
+    #undo {
+      background-color: #d4a76a;
+      color: #4b2e2b;
+    }
+
+    #undo:hover:enabled {
+      background-color: #c0965b;
+    }
+
+    #undo:disabled {
+      background-color: #ddd;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    #stats {
+      margin-top: 15px;
+      font-size: 0.95em;
+      color: #6d4c41;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .modal-content {
+      background: #f5e6d3;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border: 2px solid #8b4513;
+      max-width: 320px;
+      color: #4b2e2b;
+    }
+
+    .modal h2 {
+      color: #8b4513;
+    }
+
+    .modal button {
+      background-color: #8b4513;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>🜁 五子棋 · 悠然对弈</h1>
+  <p class="subtitle">落子无悔，静听棋声</p>
+
+  <div id="game-container">
+    <div id="board-wrapper">
+      <!-- 坐标标签 -->
+      <div class="label-row"></div>
+      <div class="label-col">A</div><div class="label-col">B</div><div class="label-col">C</div>
+      <div class="label-col">D</div><div class="label-col">E</div><div class="label-col">F</div>
+      <div class="label-col">G</div><div class="label-col">H</div><div class="label-col">I</div>
+      <div class="label-col">J</div><div class="label-col">K</div><div class="label-col">L</div>
+      <div class="label-col">M</div><div class="label-col">N</div><div class="label-col">O</div>
+
+      <div class="label-row">1</div><div class="label-row">2</div><div class="label-row">3</div>
+      <div class="label-row">4</div><div class="label-row">5</div><div class="label-row">6</div>
+      <div class="label-row">7</div><div class="label-row">8</div><div class="label-row">9</div>
+      <div class="label-row">10</div><div class="label-row">11</div><div class="label-row">12</div>
+      <div class="label-row">13</div><div class="label-row">14</div><div class="label-row">15</div>
+
+      <div id="board"></div>
+    </div>
+
+    <div id="status">当前玩家：黑子</div>
+    <div>
+      <button id="undo">悔棋</button>
+      <button id="reset">重新开始</button>
+    </div>
+    <div id="stats">黑胜: 0 | 白胜: 0</div>
+  </div>
+
+  <div id="winModal" class="modal">
+    <div class="modal-content">
+      <h2>🎉 恭喜！</h2>
+      <p id="winnerText"></p>
+      <button id="closeModal">返回</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== 音效：使用 Base64 编码的短提示音（可替换为自己的）=====
+    const audioData = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+    const placeSound = new Audio(audioData);
+    
+    function playSound() {
+      try {
+        placeSound.currentTime = 0;
+        placeSound.play().catch(() => {});
+      } catch {}
+    }
+
+    // ===== 游戏逻辑（不变）=====
+    const boardSize = 15;
+    const board = document.getElementById('board');
+    const status = document.getElementById('status');
+    const resetBtn = document.getElementById('reset');
+    const undoBtn = document.getElementById('undo');
+    const stats = document.getElementById('stats');
+    const winModal = document.getElementById('winModal');
+    const winnerText = document.getElementById('winnerText');
+    const closeModal = document.getElementById('closeModal');
+
+    let gameBoard = Array(boardSize).fill().map(() => Array(boardSize).fill(0));
+    let moveHistory = [];
+    let currentPlayer = 1;
+    let gameOver = false;
+
+    let winCount = JSON.parse(localStorage.getItem('gobangWinCount')) || { black: 0, white: 0 };
+    updateStats();
+
+    function updateStats() {
+      stats.textContent = `黑胜: ${winCount.black} | 白胜: ${winCount.white}`;
+    }
+
+    function saveWin(player) {
+      if (player === 1) winCount.black++;
+      else winCount.white++;
+      localStorage.setItem('gobangWinCount', JSON.stringify(winCount));
+      updateStats();
+    }
+
+    function initBoard() {
+      board.innerHTML = '';
+      for (let r = 0; r < boardSize; r++) {
+        for (let c = 0; c < boardSize; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function handleCellClick(e) {
+      if (gameOver) return;
+      const r = parseInt(e.target.dataset.row);
+      const c = parseInt(e.target.dataset.col);
+      if (isNaN(r) || isNaN(c) || gameBoard[r][c] !== 0) return;
+
+      gameBoard[r][c] = currentPlayer;
+      moveHistory.push({ r, c, player: currentPlayer });
+
+      const stone = document.createElement('div');
+      stone.className = `stone ${currentPlayer === 1 ? 'black' : 'white'}`;
+      e.target.appendChild(stone);
+
+      playSound();
+
+      if (checkWin(r, c, currentPlayer)) {
+        highlightWin(r, c, currentPlayer);
+        setTimeout(() => {
+          winnerText.textContent = `${currentPlayer === 1 ? '黑子' : '白子'} 获胜！`;
+          winModal.style.display = 'flex';
+          saveWin(currentPlayer);
+        }, 600);
+        gameOver = true;
+        undoBtn.disabled = true;
+        return;
+      }
+
+      currentPlayer = 3 - currentPlayer; // 1→2, 2→1
+      status.textContent = `当前玩家：${currentPlayer === 1 ? '黑子' : '白子'}`;
+      undoBtn.disabled = false;
+    }
+
+    function checkWin(r, c, p) {
+      const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+      for (let [dx, dy] of dirs) {
+        let cnt = 1;
+        for (let i = 1; i < 5; i++) {
+          const x = r + dx*i, y = c + dy*i;
+          if (x >= 0 && x < 15 && y >= 0 && y < 15 && gameBoard[x][y] === p) cnt++;
+          else break;
+        }
+        for (let i = 1; i < 5; i++) {
+          const x = r - dx*i, y = c - dy*i;
+          if (x >= 0 && x < 15 && y >= 0 && y < 15 && gameBoard[x][y] === p) cnt++;
+          else break;
+        }
+        if (cnt >= 5) return true;
+      }
+      return false;
+    }
+
+    function highlightWin(r, c, p) {
+      const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+      for (let [dx, dy] of dirs) {
+        let path = [{r,c}];
+        for (let i = 1; i < 5; i++) {
+          const x = r + dx*i, y = c + dy*i;
+          if (x >= 0 && x < 15 && y >= 0 && y < 15 && gameBoard[x][y] === p) path.push({r:x,c:y});
+          else break;
+        }
+        for (let i = 1; i < 5; i++) {
+          const x = r - dx*i, y = c - dy*i;
+          if (x >= 0 && x < 15 && y >= 0 && y < 15 && gameBoard[x][y] === p) path.push({r:x,c:y});
+          else break;
+        }
+        if (path.length >= 5) {
+          path.slice(0,5).forEach(pos => {
+            const el = document.querySelector(`[data-row="${pos.r}"][data-col="${pos.c}"] .stone`);
+            if (el) el.classList.add('win-stone');
+          });
+          return;
+        }
+      }
+    }
+
+    function undoMove() {
+      if (gameOver || moveHistory.length === 0) return;
+      const { r, c } = moveHistory.pop();
+      gameBoard[r][c] = 0;
+      const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+      const stone = cell?.querySelector('.stone');
+      if (stone) cell.removeChild(stone);
+      currentPlayer = 3 - currentPlayer;
+      status.textContent = `当前玩家：${currentPlayer === 1 ? '黑子' : '白子'}`;
+      undoBtn.disabled = moveHistory.length === 0;
+      gameOver = false;
+    }
+
+    function resetGame() {
+      gameBoard = Array(boardSize).fill().map(() => Array(boardSize).fill(0));
+      moveHistory = [];
+      currentPlayer = 1;
+      gameOver = false;
+      status.textContent = '当前玩家：黑子';
+      undoBtn.disabled = true;
+      initBoard();
+      winModal.style.display = 'none';
+    }
+
+    // 事件绑定
+    board.addEventListener('click', handleCellClick);
+    resetBtn.addEventListener('click', resetGame);
+    undoBtn.addEventListener('click', undoMove);
+    undoBtn.disabled = true;
+    closeModal.addEventListener('click', () => winModal.style.display = 'none');
+
+    initBoard();
+  </script>
+</body>
+</html>
